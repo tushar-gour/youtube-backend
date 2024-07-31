@@ -1,5 +1,5 @@
 import mongoose, { Schema } from "mongoose";
-import Jwt from "jsonwebtoken";
+import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
 
 const userSchema = new Schema(
@@ -9,16 +9,17 @@ const userSchema = new Schema(
             required: true,
             unique: true,
             lowercase: true,
+            trim: true,
             index: true,
         },
         email: {
             type: String,
             required: true,
             unique: true,
-            lowercase: true,
+            lowecase: true,
             trim: true,
         },
-        fullname: {
+        fullName: {
             type: String,
             required: true,
             trim: true,
@@ -29,7 +30,7 @@ const userSchema = new Schema(
             required: true,
         },
         coverImage: {
-            type: String,
+            type: String, // cloudinary url
         },
         watchHistory: [
             {
@@ -45,7 +46,9 @@ const userSchema = new Schema(
             type: String,
         },
     },
-    { timestamps: true }
+    {
+        timestamps: true,
+    }
 );
 
 userSchema.pre("save", async function (next) {
@@ -60,12 +63,12 @@ userSchema.methods.isPasswordCorrect = async function (password) {
 };
 
 userSchema.methods.generateAccessToken = function () {
-    Jwt.sign(
+    return jwt.sign(
         {
             _id: this._id,
             email: this.email,
             username: this.username,
-            fullname: this.fullname,
+            fullName: this.fullName,
         },
         process.env.ACCESS_TOKEN_SECRET,
         {
@@ -73,9 +76,8 @@ userSchema.methods.generateAccessToken = function () {
         }
     );
 };
-
 userSchema.methods.generateRefreshToken = function () {
-    Jwt.sign(
+    return jwt.sign(
         {
             _id: this._id,
         },
