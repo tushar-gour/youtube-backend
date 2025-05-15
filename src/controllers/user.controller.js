@@ -35,10 +35,10 @@ const registerUser = asyncHandler(async (req, res) => {
     // check for user creation
     // return res
 
-    const { fullName, email, username, password } = req.body;
+    const { username, email,password } = req.body;
 
     if (
-        [fullName, email, username, password].some(
+        [email, username, password].some(
             (field) => field?.trim() === ""
         )
     ) {
@@ -76,7 +76,7 @@ const registerUser = asyncHandler(async (req, res) => {
     }
 
     const user = await User.create({
-        fullName,
+        username,
         avatar: avatar.url,
         coverImage: coverImage?.url || "",
         email,
