@@ -10,7 +10,7 @@ const createPlaylist = asyncHandler(async (req, res) => {
     const playlist = new Playlist({
         name,
         description,
-        userId: req.user.id, // Assuming user ID is available in the request
+        userId: req.user._id, // Consistent with other controllers
     });
 
     await playlist.save();

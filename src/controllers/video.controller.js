@@ -20,25 +20,35 @@ const getAllVideos = asyncHandler(async (req, res) => {
 });
 
 const publishAVideo = asyncHandler(async (req, res) => {
-    const { title, description } = req.body;
+    const { title, description, duration } = req.body;
 
-    if (!title || !description) {
-        throw new ApiError(400, "Title and description are required");
+    if (!title || !description || !duration) {
+        throw new ApiError(400, "Title, description and duration are required");
     }
 
     const videoLocalPath = req.file?.path;
+    const thumbnailLocalPath = req.body.thumbnailPath; // Assuming thumbnail path can be sent in body or handled differently
 
     if (!videoLocalPath) {
         throw new ApiError(400, "Video file is required");
     }
 
-    const video = await uploadOnCloudinary(videoLocalPath);
-    
+    const videoUploadResult = await uploadOnCloudinary(videoLocalPath);
+
+    let thumbnailUploadResult;
+    if (thumbnailLocalPath) {
+        thumbnailUploadResult = await uploadOnCloudinary(thumbnailLocalPath);
+    } else {
+        thumbnailUploadResult = { url: "" }; // Or set a default thumbnail URL
+    }
+
     const newVideo = new Video({
         title,
         description,
-        videoUrl: video.url,
-        owner: req.user.id, // Assuming user ID is available in the request
+        duration,
+        videoFile: videoUploadResult.url,
+        thumbnail: thumbnailUploadResult.url,
+        owner: req.user._id, // Consistent with user controller
     });
 
     await newVideo.save();

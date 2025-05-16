@@ -244,7 +244,7 @@ const changeCurrentPassword = asyncHandler(async (req, res) => {
 
     const isPasswordCorrect = await user.isPasswordCorrect(oldPassword);
 
-    if (isPasswordCorrect) {
+    if (!isPasswordCorrect) {
         throw new ApiError(400, "Invalid old password");
     }
 

@@ -8,16 +8,12 @@ import { asyncHandler } from "../utils/asyncHandler.js";
 
 const getChannelStats = asyncHandler(async (req, res) => {
     const { channel } = req.params;
-    const { page = 1, limit = 10 } = req.query;
 
     if (!mongoose.Types.ObjectId.isValid(channel)) {
         throw new ApiError(400, "Invalid channel ID");
     }
 
-    const totalSubscribers = await Subscription.find({ channel })
-        .skip((page - 1) * limit)
-        .limit(parseInt(limit))
-        .countDocuments({ channel });
+    const totalSubscribers = await Subscription.countDocuments({ channel });
 
     const totalVideos = await Video.countDocuments({ owner: channel });
 
@@ -28,7 +24,7 @@ const getChannelStats = asyncHandler(async (req, res) => {
 
     const totalLikes = await Like.countDocuments({ channel: channel });
 
-    return res.status(201).json(
+    return res.status(200).json(
         new ApiResponse(
             200, 
             {
@@ -50,8 +46,8 @@ const getChannelVideos = asyncHandler(async (req, res) => {
     }
     const totalVideos = await Video.countDocuments({ owner: channel });
 
-    return res.status(201).json(
-        new ApiResponse(201, totalVideos, "Videos fetched successfully")
+    return res.status(200).json(
+        new ApiResponse(200, totalVideos, "Videos fetched successfully")
     );
 });
 

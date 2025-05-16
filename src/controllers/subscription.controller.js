@@ -12,7 +12,7 @@ const toggleSubscription = asyncHandler(async (req, res) => {
         throw new ApiError(400, "Invalid channel ID");
     }
 
-    const existingSubscription = await Subscription.findOne({ channel: channelId, user: req.user.id });
+    const existingSubscription = await Subscription.findOne({ channel: channelId, user: req.user._id });
 
     if (existingSubscription) {
         // If the subscription exists, remove it
@@ -20,7 +20,7 @@ const toggleSubscription = asyncHandler(async (req, res) => {
         return res.status(200).json(new ApiResponse(200, null, "Unsubscribed successfully"));
     } else {
         // If the subscription does not exist, create it
-        const newSubscription = new Subscription({ channel: channelId, user: req.user.id });
+        const newSubscription = new Subscription({ channel: channelId, user: req.user._id });
         await newSubscription.save();
         return res.status(201).json(new ApiResponse(201, newSubscription, "Subscribed successfully"));
     }
